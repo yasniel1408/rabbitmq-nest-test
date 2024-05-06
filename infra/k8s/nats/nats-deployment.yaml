@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      labels:
+        app: nats
+    spec:
+      containers:
+        - name: nats
+          image: "nats:latest"
+          args: [
+              "-js", # JetStream
+              "-V", # trace
+              "-p",
+              "4222",
+              "-m",
+              "8222",
+              # "-n ecommerce.com", # Este es el nombre al cual luego hacermos refetencia para conectarnos
+            ]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "800m"
