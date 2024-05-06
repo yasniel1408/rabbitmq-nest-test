@@ -12,14 +12,14 @@ spec:
     - host: ecommerce.com
       http:
         paths:
-          - path: /api/orders/?(.*)
+          - path: /api/v1/orders/?(.*)
             pathType: Prefix
             backend:
               service:
                 name: orders-service
                 port:
                   number: 3000
-          - path: /api/products/?(.*)
+          - path: /api/v1/products/?(.*)
             pathType: Prefix
             backend:
               service:

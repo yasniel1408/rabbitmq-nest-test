@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { NATS_SERVICE, natsOptions } from './constants';
+import { RMQ_SERVICE } from './constants';
 
 @Module({
   imports: [
@@ -13,16 +13,19 @@ import { NATS_SERVICE, natsOptions } from './constants';
       isGlobal: true,
       cache: true,
     }),
-    // NATS Client
+    // RMQ Client
     ClientsModule.registerAsync([
       {
-        name: NATS_SERVICE,
+        name: RMQ_SERVICE,
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({
-          transport: Transport.NATS,
+          transport: Transport.RMQ,
           options: {
-            servers: [configService.getOrThrow<string>('NATS_SERVERS')],
-            ...natsOptions,
+            urls: [configService.getOrThrow<string>('RMQ_SERVERS')],
+            queue: 'products_queue',
+            queueOptions: {
+              durable: false,
+            },
           },
         }),
         inject: [ConfigService],

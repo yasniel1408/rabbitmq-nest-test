@@ -1,28 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nats-deployment
+  name: rabbitmq-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nats
+      app: rabbitmq
   template:
     metadata:
       labels:
-        app: nats
+        app: rabbitmq
     spec:
       containers:
-        - name: nats
-          image: "nats:latest"
+        - name: rabbitmq
+          image: "rabbitmq:latest"
           args: [
-              "-js", # JetStream
-              "-V", # trace
-              "-p",
-              "4222",
-              "-m",
-              "8222",
-              # "-n ecommerce.com", # Este es el nombre al cual luego hacermos refetencia para conectarnos
+              # "-js", 
+              # "-V", 
+              # "-p",
+              # "4222",
+              # "-m",
+              # "8222",
             ]
           resources:
             requests:

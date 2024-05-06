@@ -4,7 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
-import { natsOptions } from './app/constants';
 import { setupApp } from './setup-app';
 import { setupMicroservice } from './setup-microservice';
 
@@ -19,16 +18,21 @@ async function bootstrap() {
   await app.listen(configService.getOrThrow<number>('PORT'));
 
   // MICROSERVICE rabbitmq
-  const microserviceAppNATS =
+  const microserviceAppRMQ =
     await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-      transport: Transport.NATS,
+      transport: Transport.RMQ,
+      logger: new Logger('Products Microservice'),
       options: {
-        servers: [configService.getOrThrow<string>('NATS_SERVERS')],
-        ...natsOptions,
+        urls: [configService.getOrThrow<string>('RMQ_SERVERS')],
+        queue: 'products_queue',
+        queueOptions: {
+          durable: false,
+        },
+        noAck: false,
       },
     });
-  setupMicroservice(microserviceAppNATS);
-  await microserviceAppNATS.listen();
-  logger.log(`Microservice with NATS is running`);
+  setupMicroservice(microserviceAppRMQ);
+  await microserviceAppRMQ.listen();
+  logger.log(`Microservice with RMQ is running`);
 }
 bootstrap();
