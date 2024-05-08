@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule } from '@nestjs/config';
+import { RmqModule } from 'src/rmq/rmq.module';
+import { RMQ_SERVICE } from '../rmq/constants';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RMQ_SERVICE } from './constants';
 
 @Module({
   imports: [
@@ -14,23 +14,9 @@ import { RMQ_SERVICE } from './constants';
       cache: true,
     }),
     // RMQ Client
-    ClientsModule.registerAsync([
-      {
-        name: RMQ_SERVICE,
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [configService.getOrThrow<string>('RMQ_SERVERS')],
-            queue: 'products_queue',
-            queueOptions: {
-              durable: false,
-            },
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
+    RmqModule.register({
+      name: RMQ_SERVICE,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
